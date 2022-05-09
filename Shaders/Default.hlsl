@@ -111,6 +111,7 @@ VertexOut VS(VertexIn vin)
 
 float4 PS(VertexOut pin) : SV_Target
 {
+  
     float4 diffuseAlbedo = gDiffuseMap.Sample(gsamLinear, pin.TexC) * gDiffuseAlbedo;
     diffuseAlbedo *= gAlphaMap.Sample(gsamAnisotropicWrap, pin.TexC);
 
