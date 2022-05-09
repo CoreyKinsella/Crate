@@ -20,8 +20,14 @@
 // Include structures and functions for lighting.
 #include "LightingUtil.hlsl"
 
-Texture2D    gDiffuseMap : register(t0);
+Texture2D gDiffuseMap : register(t0);
+Texture2D gAlphaMap : register(t1);
+Texture2D gFlare : register(t1);
+Texture2D gFlareAlpha : register(t2);
 SamplerState gsamLinear  : register(s0);
+SamplerState gsamPointClamp : register(s1);
+SamplerState gsamAnisotropicWrap : register (s4);
+SamplerState gsamAnisotropicClamp : register (s5);
 
 
 // Constant data that varies per frame.
@@ -97,7 +103,7 @@ VertexOut VS(VertexIn vin)
 	// Output vertex attributes for interpolation across triangle.
     float4 texC = mul(float4(vin.TexC, 0.0f, 1.0f), gTexTransform);
     vout.TexC = mul(texC, gMatTransform).xy;
-    vout.TexC *= 2.5f;
+    //vout.TexC *= 2.5f;
 
 
     return vout;
@@ -106,6 +112,14 @@ VertexOut VS(VertexIn vin)
 float4 PS(VertexOut pin) : SV_Target
 {
     float4 diffuseAlbedo = gDiffuseMap.Sample(gsamLinear, pin.TexC) * gDiffuseAlbedo;
+    diffuseAlbedo *= gAlphaMap.Sample(gsamAnisotropicWrap, pin.TexC);
+
+    float4 flareAlbedo = gFlare.Sample(gsamAnisotropicWrap, pin.TexC) * gDiffuseAlbedo;
+    float4 flareAlphaAlbedo = gFlareAlpha.Sample(gsamAnisotropicWrap, pin.TexC) * gDiffuseAlbedo;
+
+    float4 flareCombinedAlbedo = flareAlbedo * flareAlphaAlbedo;
+
+
 
     // Interpolating normal can unnormalize it, so renormalize it.
     pin.NormalW = normalize(pin.NormalW);

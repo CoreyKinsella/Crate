@@ -282,26 +282,20 @@ void CrateApp::UpdateCamera(const GameTimer& gt)
 void CrateApp::AnimateMaterials(const GameTimer& gt)
 {
 	Material* tFlare = mMaterials["flare"].get();
-	//XMFLOAT4X4 tempRotation;
-	//XMStoreFloat4x4(&tempRotation, XMMatrixRotationX(3.f * gt.TotalTime()));
-	//XMStoreFloat4x4(&tempRotation, XMMatrixRotationY(3.f * gt.TotalTime()));
-	//XMStoreFloat4x4(&tempRotation, XMMatrixRotationZ(3.f * gt.TotalTime()));
-	//tFlare->MatTransform = tempRotation;
 
-	// Scroll the flare material texture coordinates.
 
 	float& tu = tFlare->MatTransform(3, 0);
 	float& tv = tFlare->MatTransform(3, 1);
 
-	tu += 0.2f * gt.DeltaTime();
-	tv += 0.06f * gt.DeltaTime();
 	tu += 0.1f * gt.DeltaTime();
 	tv += 0.02f * gt.DeltaTime();
 
 	if (tu >= 1.0f)
 		tu -= 1.0f;
+
 	if (tv >= 1.0f)
 		tv -= 1.0f;
+
 	tFlare->MatTransform(3, 0) = tu;
 	tFlare->MatTransform(3, 1) = tv;
 	tFlare->NumFramesDirty = gNumFrameResources;
@@ -389,6 +383,7 @@ void CrateApp::LoadTextures()
 		woodCrateTex->Resource, woodCrateTex->UploadHeap));
 
 	mTextures[woodCrateTex->Name] = std::move(woodCrateTex);
+
 	auto flareTex = std::make_unique<Texture>();
 	flareTex->Name = "flareTex";
 	flareTex->Filename = L"../../Textures/flare.dds";
